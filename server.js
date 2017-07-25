@@ -10,9 +10,23 @@ app.use(require("./routes/index.jsx"));
 
 // DB TEST STUFF
 
-// var mongoose = require("mongoose");
+var mongoose = require("mongoose");
 
-// var db = process.env.MONGODB_URI || "mongodb://localhost/mongoTestAggregate";
+var Test = require("./models/testModel.js");
+
+var db = process.env.MONGODB_URI || "mongodb://localhost/mongoTestAggregate";
+
+// Connect mongoose to our database
+mongoose.connect(db, function(error) {
+  // Log any errors connecting with mongoose
+  if (error) {
+    console.log(error);
+  }
+  // Or log a success message
+  else {
+    console.log("mongoose connection is successful");
+  }
+});
 
 
 
