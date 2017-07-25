@@ -7,7 +7,7 @@ var ReactRouter = require('react-router');
 
 
 router.get('*', function(request, response) {
-	var props = { title: 'Aggregate'};
+	var props = { title: 'Aggregate' };
 	ReactRouter.match({
 	routes: require('./routes.jsx'),
 	location: request.url
