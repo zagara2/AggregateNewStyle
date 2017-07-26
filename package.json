@@ -8,6 +8,7 @@
     "babel-loader": "^7.1.1",
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.24.1",
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "mongoose": "^4.11.4",
     "react": "^15.6.1",

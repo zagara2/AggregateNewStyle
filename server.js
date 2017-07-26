@@ -9,18 +9,20 @@ app.use(express.static("public"));
 // app.use(require("./routes/index.jsx"));
 
 
-// Any non API GET routes will be directed to our React App and handled by React Router
-app.get("*", function(req, res) {
-  res.sendFile(__dirname + "/public/index.html");
-});
 
 // DB TEST STUFF START
-
+var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
+// Set mongoose to leverage built in JavaScript ES6 Promises
+mongoose.Promise = Promise;
+
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 var Test = require("./models/testModel.js");
 
-var db = process.env.MONGODB_URI || "mongodb://localhost/mongoTestAggregate";
+var db = process.env.MONGODB_URI || "mongodb://localhost/mongoTestAggregate3";
 
 // Connect mongoose to our database
 mongoose.connect(db, function(error) {
@@ -37,15 +39,15 @@ mongoose.connect(db, function(error) {
 //DB TEST: ROUTES
 
 // Route to post our form submission to mongoDB via mongoose
-app.post("/about", function(req, res) {
+app.post("/submit", function(req, res) {
 
   // We use the "Example" class we defined above to check our req.body(what the user typed in) against our user model(how we specified things have to be in order to be accepted into the database)
   //putting the user input into a format that can be saved to the database
-  var test = new Test(req.body);
+  var user = new Test(req.body);
 
   // With the new "Example" object created, we can save our data to mongoose
   // Notice the different syntax. The magic happens in userModel.js
-  test.save(function(error, doc) { //doc is the data to be saved
+  user.save(function(error, doc) { //doc is the data to be saved
     // Send any errors to the browser
     if (error) {
       res.send(error);
@@ -74,6 +76,11 @@ app.get("/users", function(req, res) {
 });
 
 
+// Any non API GET routes will be directed to our React App and handled by React Router
+//this goes last since routes are evaluated in order, and this is a catch all last resort route!
+app.get("*", function(req, res) {
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 
 //END OF DB TEST STUFF 

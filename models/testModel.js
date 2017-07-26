@@ -4,11 +4,10 @@ var Schema = mongoose.Schema;
 
 var testSchema = new Schema({
   username: {
-    type: String
+    type: String,
+    trim: true,
   },
-  // _id: {
-  //   type: Schema.Types.ObjectId 
-  // },
+
 
   password: {
   	type: String
@@ -23,3 +22,4 @@ var testSchema = new Schema({
 
 var Test = mongoose.model("Test", testSchema);
 module.exports = Test;
+
