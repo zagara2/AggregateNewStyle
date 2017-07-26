@@ -6,9 +6,15 @@ var express = require('express');
 var app = express();
 
 app.use(express.static("public"));
-app.use(require("./routes/index.jsx"));
+// app.use(require("./routes/index.jsx"));
 
-// DB TEST STUFF
+
+// Any non API GET routes will be directed to our React App and handled by React Router
+app.get("*", function(req, res) {
+  res.sendFile(__dirname + "/public/index.html");
+});
+
+// DB TEST STUFF START
 
 var mongoose = require("mongoose");
 
@@ -27,6 +33,46 @@ mongoose.connect(db, function(error) {
     console.log("mongoose connection is successful");
   }
 });
+
+//DB TEST: ROUTES
+
+// Route to post our form submission to mongoDB via mongoose
+app.post("/about", function(req, res) {
+
+  // We use the "Example" class we defined above to check our req.body(what the user typed in) against our user model(how we specified things have to be in order to be accepted into the database)
+  //putting the user input into a format that can be saved to the database
+  var test = new Test(req.body);
+
+  // With the new "Example" object created, we can save our data to mongoose
+  // Notice the different syntax. The magic happens in userModel.js
+  test.save(function(error, doc) { //doc is the data to be saved
+    // Send any errors to the browser
+    if (error) {
+      res.send(error);
+    }
+    // Otherwise, send the new doc to the browser
+    else {
+      res.send(doc);
+    }
+  });
+});
+
+
+// Route to get all saved users
+app.get("/users", function(req, res) {
+
+  Test.find({})
+    .exec(function(err, doc) {
+
+      if (err) {
+        console.log(err);
+      }
+      else {
+        res.send(doc);
+      }
+    });
+});
+
 
 
 

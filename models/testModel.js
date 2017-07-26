@@ -3,11 +3,15 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var testSchema = new Schema({
-  user: {
+  username: {
     type: String
   },
-  _id: {
-    type: Schema.Types.ObjectId 
+  // _id: {
+  //   type: Schema.Types.ObjectId 
+  // },
+
+  password: {
+  	type: String
   },
   
   email: {

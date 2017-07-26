@@ -13805,7 +13805,7 @@ var routes = __webpack_require__(216);
 // var props = window.PROPS;
 
 ReactDOM.render(
-	routes, document
+	routes, document.getElementById("app")
 );
 
 /***/ }),
@@ -25038,8 +25038,6 @@ module.exports = ReactDOMInvalidARIAHook;
 /* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var React = __webpack_require__(11);
 var ReactRouter = __webpack_require__(104);
 var Router = ReactRouter.Router;
@@ -25047,15 +25045,15 @@ var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute; // a reactrouter component for the default route
 var browserHistory = ReactRouter.browserHistory;
 
-if (typeof window === 'object') {
-	function createElement(Component, props) {
-		return React.createElement(Component, _extends({}, props, { custom: window.PROPS }));
-	}
-}
+// if (typeof window === 'object') {
+// 	function createElement(Component, props) {
+// 		return <Component {...props} custom = {window.PROPS} />;
+// 	}
+// }
 
 module.exports = React.createElement(
 	Router,
-	{ history: browserHistory, createElement: createElement },
+	{ history: browserHistory },
 	React.createElement(
 		Route,
 		{ path: '/', component: __webpack_require__(243) },
@@ -27386,67 +27384,47 @@ module.exports = React.createClass({
 		alert();
 	},
 	render: function () {
-		var custom = this.props.custom;
+
 		return React.createElement(
-			'html',
+			'div',
 			null,
 			React.createElement(
-				'head',
+				'h1',
 				null,
-				React.createElement(
-					'title',
-					null,
-					custom.title
-				),
-				React.createElement('link', { rel: 'stylesheet', href: '/style.css' })
+				' Aggregate '
 			),
 			React.createElement(
-				'body',
+				'p',
+				null,
+				' Isnt server-side rendering remarkable?'
+			),
+			React.createElement(
+				'button',
+				{ onClick: this._handleClick },
+				'Click Me'
+			),
+			this.props.children,
+			React.createElement(
+				'ul',
 				null,
 				React.createElement(
-					'h1',
-					null,
-					' ',
-					custom.title,
-					' '
-				),
-				React.createElement(
-					'p',
-					null,
-					' Isnt server-side rendering remarkable?'
-				),
-				React.createElement(
-					'button',
-					{ onClick: this._handleClick },
-					'Click Me'
-				),
-				this.props.children,
-				React.createElement(
-					'ul',
+					'li',
 					null,
 					React.createElement(
-						'li',
-						null,
-						React.createElement(
-							Link,
-							{ to: '/' },
-							'Home'
-						)
-					),
-					React.createElement(
-						'li',
-						null,
-						React.createElement(
-							Link,
-							{ to: '/about' },
-							'About'
-						)
+						Link,
+						{ to: '/' },
+						'Home'
 					)
 				),
-				React.createElement('script', { dangerouslySetInnerHTML: {
-						__html: 'window.PROPS=' + JSON.stringify(custom)
-					} }),
-				React.createElement('script', { src: '/bundle.js' })
+				React.createElement(
+					'li',
+					null,
+					React.createElement(
+						Link,
+						{ to: '/about' },
+						'About'
+					)
+				)
 			)
 		);
 	}
@@ -27487,20 +27465,20 @@ module.exports = React.createClass({
 var React = __webpack_require__(11);
 
 module.exports = React.createClass({
-	displayName: 'About',
+		displayName: 'About',
 
-	render: function () {
-		return React.createElement(
-			'p',
-			null,
-			'Current: ',
-			React.createElement(
-				'strong',
-				null,
-				'About'
-			)
-		);
-	}
+		render: function () {
+				return React.createElement(
+						'p',
+						null,
+						'Current: ',
+						React.createElement(
+								'strong',
+								null,
+								'About'
+						)
+				);
+		}
 
 });
 

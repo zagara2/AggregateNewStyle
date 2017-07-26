@@ -8,6 +8,7 @@ render: function() {
 		<p>
 		Current: <strong>Index</strong>
 		</p>
+		
 
 		
 

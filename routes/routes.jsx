@@ -5,16 +5,16 @@ var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute; // a reactrouter component for the default route
 var browserHistory = ReactRouter.browserHistory;
 
-if (typeof window === 'object') {
-	function createElement(Component, props) {
-		return <Component {...props} custom = {window.PROPS} />;
-	}
-}
+// if (typeof window === 'object') {
+// 	function createElement(Component, props) {
+// 		return <Component {...props} custom = {window.PROPS} />;
+// 	}
+// }
 
 module.exports = (  
 
 
-<Router history = {browserHistory} createElement= {createElement}>
+<Router history = {browserHistory}>
 <Route path = '/' component ={require('../views/Layout.jsx')}>
 //now we add routes within Route
 	<IndexRoute component = {require('../views/Index.jsx')} /> //doesn't need path since it's the index component

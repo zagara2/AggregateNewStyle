@@ -8,5 +8,5 @@ var routes = require('./routes/routes.jsx');
 // var props = window.PROPS;
 
 ReactDOM.render(
-	routes, document
+	routes, document.getElementById("app")
 );
