@@ -206,7 +206,11 @@ app.post("/submitBoard", function(req, res) {
             // Or just log the doc we saved
             else {
                 // console.log(doc);
-                res.send(doc);
+                // res.send(doc); 
+                //uncomment above line just to see api stuff for the given board, otherwise the below line just sends you back to 
+                //an updated version of your landing page
+                //should it send you right to the page for that event?
+                res.redirect("/admin");
                 // Place the log back in this callback function
                 // so it can be used with other functions asynchronously
                 // cb(doc);
