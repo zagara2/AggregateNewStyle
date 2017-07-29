@@ -104,7 +104,7 @@ app.get('/', function(req, res) {
          */
         res.redirect('/admin');
     } else {
-        res.render('./public/index.html');
+        res.sendFile(__dirname + './public/index.html');
     }
 });
 
@@ -113,18 +113,20 @@ app.post('/login', function(req, res) {
     //check if user's email is in the db
     //or rather, check if there is a db entry that matches both the entered email and pword
 
-    Test.find( {$and: [{email: req.body.email}, {password: req.body.pass} ]})
+    Test.find({ $and: [{ email: req.body.email }, { password: req.body.pass }] })
         .exec(function(err, doc) {
 
             if (err) {
                 console.log(err);
             } else if (!doc.length) { //if no entry found that matches both 
-            	console.log("email/password mismatch");
-            	flash = {"msg": "Email/password mismatch! Try again.",
-            			"level": "warning"};
-            	res.setHeader('Content-Type', 'application/json');
-    			res.send(JSON.stringify(flash));
-                
+                console.log("email/password mismatch");
+                flash = {
+                    "msg": "Email/password mismatch! Try again.",
+                    "level": "warning"
+                };
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify(flash));
+
                 // alert("email/password mismatch! try again");
             } else {
                 // res.send(doc);
@@ -143,8 +145,9 @@ app.post('/login', function(req, res) {
 app.get('/admin', function(req, res) {
     sess = req.session;
     if (sess.email) {
-        res.write('<h1>Hello ' + sess.email + '</h1>');
-        res.end('<a href="/logout">Logout</a>');
+        // res.write('<h1>Hello ' + sess.email + '</h1>');
+        // res.end('<a href="/logout">Logout</a>');
+        res.sendFile(__dirname + '/public/adminLanding.html');
     } else {
         res.write('<h1>Please login first.</h1>');
         res.end('<a href="/">Login</a>');
@@ -167,10 +170,90 @@ app.get('/logout', function(req, res) {
 //END OF EXPRESS TUTORIAL ROUTE STUFF
 
 
+//Routes for board creation
+
+var Board = require("./models/boardModel.js");
+
+// Route to post our form submission to mongoDB via mongoose
+app.post("/submitBoard", function(req, res) {
+
+	// console.log(req.body);
+
+	 sess = req.session;
+	 if (sess.email) {
+    
+
+        var newBoard = {
+            boardname: req.body.boardname,
+            description: req.body.description,
+            owner: sess.email,
+            imageLink: req.body.imageLink,
+            dataSourceIDs: []
+
+        };
+
+        // console.log(newBoard);
+
+        // Save the new board we made to mongoDB with mongoose's save function
+        Board.create(newBoard, function(err, doc) {
+            // Log any errors
+            if (err) {
+                console.log(err);
+            }
+            // Or just log the doc we saved
+            else {
+                // console.log(doc);
+                res.send(doc);
+                // Place the log back in this callback function
+                // so it can be used with other functions asynchronously
+                // cb(doc);
+            }
+        });
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+
+
+});
+
+
+// Route to get all of a user's boards
+app.get("/myBoards", function(req, res) {
+
+    sess = req.session;
+
+    if (sess.email) {
+
+        Board.find({ owner: sess.email })
+            .exec(function(err, doc) {
+
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.send(doc);
+                }
+            });
+
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+});
+
+
+
+
+//end of routes for board creation
+
+
 // Any non API GET routes will be directed to our React App and handled by React Router
 //this goes last since routes are evaluated in order, and this is a catch all last resort route!
 app.get("*", function(req, res) {
-    res.sendFile(__dirname + "/public/index.html");
+    // res.sendFile(__dirname + "/public/index.html");
+    res.redirect("/");
 });
 
 
