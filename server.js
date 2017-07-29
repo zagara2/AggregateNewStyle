@@ -1,9 +1,25 @@
 require("babel-register")({
-	presets: ['react']
+    presets: ['react']
 });
 
 var express = require('express');
+var session = require('express-session');
 var app = express();
+
+//from express session tutorial
+// app.set('public', __dirname + '/public');
+//app.engine('html', require('ejs').renderFile);
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}))
+
+var sess;
+//
+
 
 app.use(express.static("public"));
 // app.use(require("./routes/index.jsx"));
@@ -17,7 +33,7 @@ var mongoose = require("mongoose");
 mongoose.Promise = Promise;
 
 app.use(bodyParser.urlencoded({
-  extended: false
+    extended: true //changed to "true" because of express session tutorial 
 }));
 
 var Test = require("./models/testModel.js");
@@ -26,14 +42,14 @@ var db = process.env.MONGODB_URI || "mongodb://localhost/mongoTestAggregate3";
 
 // Connect mongoose to our database
 mongoose.connect(db, function(error) {
-  // Log any errors connecting with mongoose
-  if (error) {
-    console.log(error);
-  }
-  // Or log a success message
-  else {
-    console.log("mongoose connection is successful");
-  }
+    // Log any errors connecting with mongoose
+    if (error) {
+        console.log(error);
+    }
+    // Or log a success message
+    else {
+        console.log("mongoose connection is successful");
+    }
 });
 
 //DB TEST: ROUTES
@@ -41,52 +57,127 @@ mongoose.connect(db, function(error) {
 // Route to post our form submission to mongoDB via mongoose
 app.post("/submit", function(req, res) {
 
-  // We use the "Example" class we defined above to check our req.body(what the user typed in) against our user model(how we specified things have to be in order to be accepted into the database)
-  //putting the user input into a format that can be saved to the database
-  var user = new Test(req.body);
+    // We use the "Example" class we defined above to check our req.body(what the user typed in) against our user model(how we specified things have to be in order to be accepted into the database)
+    //putting the user input into a format that can be saved to the database
+    var user = new Test(req.body);
 
-  // With the new "Example" object created, we can save our data to mongoose
-  // Notice the different syntax. The magic happens in userModel.js
-  user.save(function(error, doc) { //doc is the data to be saved
-    // Send any errors to the browser
-    if (error) {
-      res.send(error);
-    }
-    // Otherwise, send the new doc to the browser
-    else {
-      res.send(doc);
-    }
-  });
+    // With the new "Example" object created, we can save our data to mongoose
+    // Notice the different syntax. The magic happens in userModel.js
+    user.save(function(error, doc) { //doc is the data to be saved
+        // Send any errors to the browser
+        if (error) {
+            res.send(error);
+        }
+        // Otherwise, send the new doc to the browser
+        else {
+            res.send(doc);
+        }
+    });
 });
 
 
 // Route to get all saved users
 app.get("/users", function(req, res) {
 
-  Test.find({})
-    .exec(function(err, doc) {
+    Test.find({})
+        .exec(function(err, doc) {
 
-      if (err) {
-        console.log(err);
-      }
-      else {
-        res.send(doc);
-      }
-    });
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(doc);
+            }
+        });
 });
+
+//END OF DB TEST STUFF 
+
+//START OF EXPRESS SESSION TUTORIAL ROUTE STUFF
+
+app.get('/', function(req, res) {
+    sess = req.session;
+    //Session set when user Request our app via URL
+    if (sess.email) {
+        /*
+         * This line check Session existence.
+         * If it existed will do some action.
+         */
+        res.redirect('/admin');
+    } else {
+        res.render('./public/index.html');
+    }
+});
+
+app.post('/login', function(req, res) {
+    console.log(req.body);
+    //check if user's email is in the db
+    //or rather, check if there is a db entry that matches both the entered email and pword
+
+    Test.find( {$and: [{email: req.body.email}, {password: req.body.pass} ]})
+        .exec(function(err, doc) {
+
+            if (err) {
+                console.log(err);
+            } else if (!doc.length) { //if no entry found that matches both 
+            	console.log("email/password mismatch");
+            	flash = {"msg": "Email/password mismatch! Try again.",
+            			"level": "warning"};
+            	res.setHeader('Content-Type', 'application/json');
+    			res.send(JSON.stringify(flash));
+                
+                // alert("email/password mismatch! try again");
+            } else {
+                // res.send(doc);
+                sess = req.session;
+                //In this we are assigning email to sess.email variable.
+                //email comes from HTML page.
+                sess.email = req.body.email;
+                res.end('done');
+            }
+        });
+
+
+
+});
+
+app.get('/admin', function(req, res) {
+    sess = req.session;
+    if (sess.email) {
+        res.write('<h1>Hello ' + sess.email + '</h1>');
+        res.end('<a href="/logout">Logout</a>');
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/login">Login</a>');
+    }
+});
+
+app.get('/logout', function(req, res) {
+    req.session.destroy(function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect('/');
+        }
+    });
+
+});
+
+
+
+//END OF EXPRESS TUTORIAL ROUTE STUFF
 
 
 // Any non API GET routes will be directed to our React App and handled by React Router
 //this goes last since routes are evaluated in order, and this is a catch all last resort route!
 app.get("*", function(req, res) {
-  res.sendFile(__dirname + "/public/index.html");
+    res.sendFile(__dirname + "/public/index.html");
 });
 
 
-//END OF DB TEST STUFF 
+
 
 var PORT = process.env.PORT || 3000;
 app.listen(PORT, function() {
 
-console.log('http://localhost:' + PORT);
+    console.log('http://localhost:' + PORT);
 });
