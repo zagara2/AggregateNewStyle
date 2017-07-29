@@ -94,19 +94,22 @@ app.get("/users", function(req, res) {
 
 //START OF EXPRESS SESSION TUTORIAL ROUTE STUFF
 
-app.get('/', function(req, res) {
-    sess = req.session;
-    //Session set when user Request our app via URL
-    if (sess.email) {
-        /*
-         * This line check Session existence.
-         * If it existed will do some action.
-         */
-        res.redirect('/admin');
-    } else {
-        res.sendFile(__dirname + './public/index.html');
-    }
-});
+// app.get('/', function(req, res) {
+//     sess = req.session;
+//     console.log("path is /");
+//     //Session set when user Request our app via URL
+//     if (sess.email) {
+        
+//          * This line check Session existence.
+//          * If it existed will do some action.
+         
+//          console.log("session found. path is /");
+//         res.redirect('/admin');
+//     } else {
+//     	console.log("session not found. path is /");
+//         res.sendFile(__dirname + './public/index.html');
+//     }
+// });
 
 app.post('/login', function(req, res) {
     console.log(req.body);
@@ -147,7 +150,7 @@ app.get('/admin', function(req, res) {
     if (sess.email) {
         // res.write('<h1>Hello ' + sess.email + '</h1>');
         // res.end('<a href="/logout">Logout</a>');
-        res.sendFile(__dirname + '/public/adminLanding.html');
+        res.sendFile(__dirname + '/html/adminLanding.html');
     } else {
         res.write('<h1>Please login first.</h1>');
         res.end('<a href="/">Login</a>');
@@ -177,11 +180,11 @@ var Board = require("./models/boardModel.js");
 // Route to post our form submission to mongoDB via mongoose
 app.post("/submitBoard", function(req, res) {
 
-	// console.log(req.body);
+    // console.log(req.body);
 
-	 sess = req.session;
-	 if (sess.email) {
-    
+    sess = req.session;
+    if (sess.email) {
+
 
         var newBoard = {
             boardname: req.body.boardname,
@@ -252,8 +255,17 @@ app.get("/myBoards", function(req, res) {
 // Any non API GET routes will be directed to our React App and handled by React Router
 //this goes last since routes are evaluated in order, and this is a catch all last resort route!
 app.get("*", function(req, res) {
-    // res.sendFile(__dirname + "/public/index.html");
-    res.redirect("/");
+    console.log("last resort");
+    sess = req.session;
+    if (sess.email) {
+    	console.log("session found. path is *");
+    	// res.sendFile(__dirname + '/html/adminLanding.html');
+        res.redirect("/admin");
+    } else {
+    	console.log("session not found. path is *");
+
+        res.sendFile(__dirname + "/html/index.html");
+    }
 });
 
 
