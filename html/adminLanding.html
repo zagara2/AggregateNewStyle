@@ -19,12 +19,13 @@
     </div>
     <div id="newBoardForm">
         <p> this is the board (event) creation form. enter data here to add a new board to your account.</p>
-        <form action="/submitBoard" method="post">
-            <input type="text" name="boardname" placeholder="Board Name">
-            <input type="text" name="description" placeholder="Description">
-            <input type="text" name="imageLink" placeholder="Image Link">
-            <input type="submit">
-        </form>
+        <!-- <form action="/submitBoard" method="post"> -->
+            <input type="text" id="boardname" placeholder="Board Name">
+            <input type="text" id="description" placeholder="Description">
+            <input type="text" id="imageLink" placeholder="Image Link">
+            <input type="button" value="Submit" id="submit">
+            <!-- <input type="submit"> -->
+        <!-- </form> -->
         <br>
     </div>
     <div id="listOfBoards">
@@ -34,6 +35,47 @@
     <a href="/logout">Logout</a>
 </body>
 <script>
+//first function: handles form submission
+$(document).ready(function() {
+
+
+    
+    // var overallurl = window.location.href
+    // var overallurlArray = overallurl.split("/");
+    // var boardID = overallurlArray[overallurlArray.length - 1];
+    // var title, url, linkType, rating;
+    $("#submit").click(function() {
+        boardname = $("#boardname").val();
+        description = $("#description").val();
+        imageLink = $("#imageLink").val();
+        
+
+
+
+        $.post("/submitBoard", { boardname: boardname, description: description, imageLink: imageLink}, function(data) {
+
+            if (data === 'done') {
+                window.location.href = "/admin";
+                
+            } else if (data.level === "warning") {
+                
+                alert(data.msg);
+            }
+        });
+
+
+
+
+
+    });
+});
+
+
+
+
+
+
+//second function: puts list of boards on the page
 $(function() {
     // var url = document.getUrl.split("/")[-1];
     $.get("/myBoards", function(boards) {

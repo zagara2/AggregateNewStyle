@@ -99,10 +99,10 @@ app.get("/users", function(req, res) {
 //     console.log("path is /");
 //     //Session set when user Request our app via URL
 //     if (sess.email) {
-        
+
 //          * This line check Session existence.
 //          * If it existed will do some action.
-         
+
 //          console.log("session found. path is /");
 //         res.redirect('/admin');
 //     } else {
@@ -195,9 +195,27 @@ app.post("/submitBoard", function(req, res) {
 
         };
 
-        // console.log(newBoard);
+        Board.find({ owner: sess.email })
+            .exec(function(err, doc) {
 
-        // Save the new board we made to mongoDB with mongoose's save function
+                if (err) {
+                    console.log(err);
+                } else if (doc.length >= 5) {
+
+                    flash = {
+                        "msg": "Too many boards! Board limit is 5.",
+                        "level": "warning"
+                    };
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify(flash));
+
+
+                }
+
+                else {
+                	console.log("enough boards");
+
+                	// Save the new board we made to mongoDB with mongoose's save function
         Board.create(newBoard, function(err, doc) {
             // Log any errors
             if (err) {
@@ -210,12 +228,23 @@ app.post("/submitBoard", function(req, res) {
                 //uncomment above line just to see api stuff for the given board, otherwise the below line just sends you back to 
                 //an updated version of your landing page
                 //should it send you right to the page for that event?
-                res.redirect("/admin");
+                console.log("board created");
+                // res.redirect("/admin");
+                res.end('done');
                 // Place the log back in this callback function
                 // so it can be used with other functions asynchronously
                 // cb(doc);
             }
         });
+
+
+
+                }
+            });
+
+       
+
+        
 
     } else {
         res.write('<h1>Please login first.</h1>');
@@ -285,7 +314,7 @@ app.get("/eventPage/api/:id", function(req, res) {
 
     if (sess.email) {
 
-    	Board.find({_id:req.params.id})
+        Board.find({ _id: req.params.id })
             .exec(function(err, doc) {
 
                 if (err) {
@@ -295,7 +324,7 @@ app.get("/eventPage/api/:id", function(req, res) {
                 }
             });
 
-        
+
 
 
     } else {
@@ -319,7 +348,7 @@ app.post("/submitLink", function(req, res) {
             addedBy: sess.email,
             url: req.body.url,
             linkType: req.body.linkType,
-            boardID:req.body.boardID
+            boardID: req.body.boardID
 
         };
 
@@ -327,48 +356,48 @@ app.post("/submitLink", function(req, res) {
 
 
         Board.find({ _id: req.body.boardID })
-        .exec(function(err, doc) {
+            .exec(function(err, doc) {
 
-        	console.log(doc);
-        	console.log("owner is: " + doc[0].owner);
-        console.log("logged in: " + sess.email);
+                console.log(doc);
+                console.log("owner is: " + doc[0].owner);
+                console.log("logged in: " + sess.email);
 
-            if (err) {
-                console.log(err);
-            } else if (doc[0].owner != sess.email) { //if owner of board is not current user
-                console.log("not your board");
-                flash = {
-                    "msg": "Not your board! You can't submit a link here.",
-                    "level": "warning"
-                };
-                res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify(flash));
-
-                
-            } else {
-
-            	// Save the new link we made to mongoDB with mongoose's save function
-        Link.create(newLink, function(err, doc2) {
-            // Log any errors
-            if (err) {
-                console.log(err);
-            }
-            // Or just log the doc we saved
-            else {
-                console.log(doc2);
-                // res.send(doc); 
-                res.end('done');
-                
-            }
-        });
-                
-                
-            }
-        });
+                if (err) {
+                    console.log(err);
+                } else if (doc[0].owner != sess.email) { //if owner of board is not current user
+                    console.log("not your board");
+                    flash = {
+                        "msg": "Not your board! You can't submit a link here.",
+                        "level": "warning"
+                    };
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(JSON.stringify(flash));
 
 
+                } else {
 
-        
+                    // Save the new link we made to mongoDB with mongoose's save function
+                    Link.create(newLink, function(err, doc2) {
+                        // Log any errors
+                        if (err) {
+                            console.log(err);
+                        }
+                        // Or just log the doc we saved
+                        else {
+                            console.log(doc2);
+                            // res.send(doc); 
+                            res.end('done');
+
+                        }
+                    });
+
+
+                }
+            });
+
+
+
+
 
     } else {
         res.write('<h1>Please login first.</h1>');
@@ -415,11 +444,11 @@ app.get("*", function(req, res) {
     console.log("last resort");
     sess = req.session;
     if (sess.email) {
-    	console.log("session found. path is *");
-    	// res.sendFile(__dirname + '/html/adminLanding.html');
+        console.log("session found. path is *");
+        // res.sendFile(__dirname + '/html/adminLanding.html');
         res.redirect("/admin");
     } else {
-    	console.log("session not found. path is *");
+        console.log("session not found. path is *");
 
         res.sendFile(__dirname + "/html/index.html");
     }
