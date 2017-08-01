@@ -33,6 +33,7 @@
 </body>
 <script>
 $(function() {
+    // var url = document.getUrl.split("/")[-1];
     $.get("/myBoards", function(boards) {
         // alert(JSON.stringify(data));
         if (boards !== 'undefined') {

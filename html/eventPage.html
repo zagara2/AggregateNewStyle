@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Aggregate</title>
+    <!-- Bootswatch -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css"> -->
+    <!-- Font-Awesome -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="./style.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+</head>
+
+<body>
+    <p> This is an individual event page. </p>
+    <!-- do some ajax to get the board name in a script tag -->
+    <div id="newDataItemForm">
+        <p> this is the link submission form. enter data here to add a new link to this event.</p>
+        <!-- <form action="/linkSubmit" method="post"> -->
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="url" placeholder="URL">
+        <input type="text" id="linkType" placeholder="Link Source: Twitter, Youtube, Soundcloud, or Other?">
+        <input type="number" id="rating" placeholder="Quality Rating (out of 10)">
+        <br />
+        <input type="button" value="Submit" id="submit">
+        <!-- <input type="submit">
+        </form> -->
+        <br>
+    </div>
+    <br>
+    <div id="twitterDiv">
+    </div>
+    <div id="soundcloudDiv">
+    </div>
+    <div id="youtubeDiv">
+    </div>
+    <div id="articleDiv">
+    </div>
+</body>
+<script>
+//first function: handles form submission
+$(document).ready(function() {
+
+
+    // var overallurl = document.getUrl.split("/");
+    var overallurl = window.location.href
+    var overallurlArray = overallurl.split("/");
+    var boardID = overallurlArray[overallurlArray.length - 1];
+    var title, url, linkType, rating;
+    $("#submit").click(function() {
+        title = $("#title").val();
+        url = $("#url").val();
+        linkType = $("#linkType").val();
+        rating = $("#rating").val();
+
+
+
+        $.post("/submitLink", { title: title, url: url, linkType: linkType, rating: rating, boardID: boardID }, function(data) {
+
+            if (data === 'done') {
+                window.location.href = "/eventPage/" + boardID;
+            } else if (data.level === "warning") {
+                // alert(JSON.stringify(data));
+                alert(data.msg);
+            }
+        });
+
+
+
+
+
+    });
+});
+
+//second function: display all the links in the appropriate divs
+//can you have 2 onpageload things?
+var overallurl = window.location.href
+var overallurlArray = overallurl.split("/");
+var boardID = overallurlArray[overallurlArray.length - 1];
+
+
+$(function() {
+    // var url = document.getUrl.split("/")[-1];
+    $.get("/eventPage/" + boardID + "/myLinks", function(links) {
+        // or is it like: $.get("/eventPage/:id/myLinks", function(links) {
+
+        if (links !== 'undefined') {
+            // var boardDiv = document.getElementById("listOfBoards");
+            for (var i = 0, len = links.length; i < len; i++) {
+                var linkObject = links[i];
+                // var newBoard = document.createElement("div");
+                var newLink = $("<div>");
+                var rating = linkObject.rating.toString();
+                // var a = document.createElement("a");
+                var textnode = "<a href ='" + linkObject.url + "'>" + linkObject.title + "</a> <br>";
+                var textnode2 = "Rating: " + rating + "<br>";
+
+                // var textnode3 =  + "<br>";
+
+
+                newLink.append(textnode);
+                // newBoard.append(textnode3);
+                newLink.append(textnode2);
+
+
+
+                //newBoard.textContent = "jfksdlfja";
+                // newBoard.appendChild(a);
+
+                if (linkObject.linkType === "twitter" || linkObject.linkType === "Twitter") {
+
+                    $("#twitterDiv").append(newLink);
+
+                } else if (linkObject.linkType === "soundcloud" || linkObject.linkType === "Soundcloud") {
+                    $("#soundcloudDiv").append(newLink);
+                } else if (linkObject.linkType === "Youtube" || linkObject.linkType === "youtube") {
+                    $("#youtubeDiv").append(newLink);
+                } else {
+                    $("#articleDiv").append(newLink);
+                }
+
+
+            }
+
+
+        } else {
+            alert("No links to display.");
+        }
+    });
+});
+</script>
+
+</html>

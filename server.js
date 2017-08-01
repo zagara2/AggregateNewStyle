@@ -256,6 +256,124 @@ app.get("/myBoards", function(req, res) {
 //end of routes for board creation
 
 
+//routes for individual event page
+
+var Link = require("./models/linkModel.js");
+
+app.get("/eventPage/:id", function(req, res) {
+
+    sess = req.session;
+
+    if (sess.email) {
+
+        res.sendFile(__dirname + "/html/eventPage.html");
+
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+});
+
+app.post("/submitLink", function(req, res) {
+
+    // console.log(req.body);
+    // console.log(req.params);
+
+    sess = req.session;
+    if (sess.email) {
+
+
+        var newLink = {
+            title: req.body.title,
+            rating: req.body.rating,
+            addedBy: sess.email,
+            url: req.body.url,
+            linkType: req.body.linkType,
+            boardID:req.body.boardID
+
+        };
+
+
+        Board.find({ _id: req.body.boardID })
+        .exec(function(err, doc) {
+
+            if (err) {
+                console.log(err);
+            } else if (doc.body.owner != sess.email) { //if owner of board is not current user
+                console.log("not your board");
+                flash = {
+                    "msg": "Not your board! You can't submit a link here.",
+                    "level": "warning"
+                };
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify(flash));
+
+                
+            } else {
+
+            	// Save the new link we made to mongoDB with mongoose's save function
+        Link.create(newLink, function(err, doc2) {
+            // Log any errors
+            if (err) {
+                console.log(err);
+            }
+            // Or just log the doc we saved
+            else {
+                console.log(doc2);
+                // res.send(doc); 
+                res.end('done');
+                
+            }
+        });
+                
+                
+            }
+        });
+
+
+
+        
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+
+
+});
+
+//get all the links for a particular board belonging to the logged in user
+
+app.get("/eventPage/:id/myLinks", function(req, res) {
+
+    sess = req.session;
+
+    if (sess.email) {
+
+        Link.find({ $and: [{ addedBy: sess.email }, { boardID: req.params.id }] })
+            .exec(function(err, doc) {
+
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.send(doc);
+                }
+            });
+
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+});
+
+
+
+
+
+//end of link-related routes
+
 // Any non API GET routes will be directed to our React App and handled by React Router
 //this goes last since routes are evaluated in order, and this is a catch all last resort route!
 app.get("*", function(req, res) {
