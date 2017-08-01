@@ -295,12 +295,18 @@ app.post("/submitLink", function(req, res) {
         };
 
 
+
+
         Board.find({ _id: req.body.boardID })
         .exec(function(err, doc) {
 
+        	console.log(doc);
+        	console.log("owner is: " + doc[0].owner);
+        console.log("logged in: " + sess.email);
+
             if (err) {
                 console.log(err);
-            } else if (doc.body.owner != sess.email) { //if owner of board is not current user
+            } else if (doc[0].owner != sess.email) { //if owner of board is not current user
                 console.log("not your board");
                 flash = {
                     "msg": "Not your board! You can't submit a link here.",

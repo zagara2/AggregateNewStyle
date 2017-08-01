@@ -10,7 +10,7 @@ var testSchema = new Schema({
 
 
   password: {
-  	type: String
+  	type: String, minlength:4
   },
   
   email: {

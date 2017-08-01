@@ -20,7 +20,7 @@
         <p> this is the link submission form. enter data here to add a new link to this event.</p>
         <!-- <form action="/linkSubmit" method="post"> -->
         <input type="text" id="title" placeholder="Title">
-        <input type="text" id="url" placeholder="URL">
+        <input type="url" id="url" placeholder="URL">
         <input type="text" id="linkType" placeholder="Link Source: Twitter, Youtube, Soundcloud, or Other?">
         <input type="number" id="rating" placeholder="Quality Rating (out of 10)">
         <br />
@@ -31,12 +31,20 @@
     </div>
     <br>
     <div id="twitterDiv">
+    <strong>Twitter Links:</strong>
+    
     </div>
     <div id="soundcloudDiv">
+    <strong>Soundcloud Links:</strong>
+    <br>
     </div>
     <div id="youtubeDiv">
+    <strong>Youtube Links:</strong>
+    <br>
     </div>
     <div id="articleDiv">
+    <strong>Other Links:</strong>
+   
     </div>
 </body>
 <script>
@@ -90,11 +98,19 @@ $(function() {
             // var boardDiv = document.getElementById("listOfBoards");
             for (var i = 0, len = links.length; i < len; i++) {
                 var linkObject = links[i];
+                console.log(linkObject);
                 // var newBoard = document.createElement("div");
                 var newLink = $("<div>");
                 var rating = linkObject.rating.toString();
                 // var a = document.createElement("a");
-                var textnode = "<a href ='" + linkObject.url + "'>" + linkObject.title + "</a> <br>";
+                myUrl = linkObject.url;
+
+                if (!linkObject.url.startsWith("http")) {
+
+                	myUrl = "https://" + linkObject.url;
+
+                }
+                var textnode = "<a href ='" + myUrl + "' target='_blank'>" + linkObject.title + "</a> <br>";
                 var textnode2 = "Rating: " + rating + "<br>";
 
                 // var textnode3 =  + "<br>";
