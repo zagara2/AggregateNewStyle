@@ -14,7 +14,9 @@
 </head>
 
 <body>
-    <p> This is an individual event page. </p>
+    <div id="titleDiv">
+        <p> This is an individual event page. </p>
+    </div>
     <!-- do some ajax to get the board name in a script tag -->
     <div id="newDataItemForm">
         <p> this is the link submission form. enter data here to add a new link to this event.</p>
@@ -31,20 +33,18 @@
     </div>
     <br>
     <div id="twitterDiv">
-    <strong>Twitter Links:</strong>
-    
+        <strong>Twitter Links:</strong>
     </div>
     <div id="soundcloudDiv">
-    <strong>Soundcloud Links:</strong>
-    <br>
+        <strong>Soundcloud Links:</strong>
+        <br>
     </div>
     <div id="youtubeDiv">
-    <strong>Youtube Links:</strong>
-    <br>
+        <strong>Youtube Links:</strong>
+        <br>
     </div>
     <div id="articleDiv">
-    <strong>Other Links:</strong>
-   
+        <strong>Other Links:</strong>
     </div>
 </body>
 <script>
@@ -107,9 +107,11 @@ $(function() {
 
                 if (!linkObject.url.startsWith("http")) {
 
-                	myUrl = "https://" + linkObject.url;
+                    myUrl = "https://" + linkObject.url;
 
                 }
+
+
                 var textnode = "<a href ='" + myUrl + "' target='_blank'>" + linkObject.title + "</a> <br>";
                 var textnode2 = "Rating: " + rating + "<br>";
 
@@ -125,13 +127,14 @@ $(function() {
                 //newBoard.textContent = "jfksdlfja";
                 // newBoard.appendChild(a);
 
-                if (linkObject.linkType === "twitter" || linkObject.linkType === "Twitter") {
+                // if (linkObject.linkType === "twitter" || linkObject.linkType === "Twitter") {
+                if (myUrl.includes("twitter.com")) {
 
                     $("#twitterDiv").append(newLink);
 
-                } else if (linkObject.linkType === "soundcloud" || linkObject.linkType === "Soundcloud") {
+                } else if (myUrl.includes("soundcloud.com")) {
                     $("#soundcloudDiv").append(newLink);
-                } else if (linkObject.linkType === "Youtube" || linkObject.linkType === "youtube") {
+                } else if (myUrl.includes("youtube.com")) {
                     $("#youtubeDiv").append(newLink);
                 } else {
                     $("#articleDiv").append(newLink);
@@ -146,6 +149,39 @@ $(function() {
         }
     });
 });
+
+//third function: make a title for the page with the appropriate board name
+$(function() {
+    // var url = document.getUrl.split("/")[-1];
+    $.get("/eventPage/api/" + boardID, function(myboard) {
+        // or is it like: $.get("/eventPage/:id/myLinks", function(links) {
+
+        	var board = myboard[0];
+        	
+        	console.log(myboard);
+
+        if (board !== 'undefined' || !board.boardname) {
+            
+                var newDiv = $("<div>");
+             
+                
+                var textnode = board.boardname;
+                console.log(textnode);
+            
+
+                newDiv.append("<h1>" + textnode + "</h1>");
+                $("#titleDiv").append(newDiv);
+                
+
+            }
+
+
+         else {
+            $('#titleDiv').append('<h1>Untitled Board</h1>');
+        }
+    });
+});
+
 </script>
 
 </html>

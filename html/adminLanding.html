@@ -14,7 +14,9 @@
 </head>
 
 <body>
-    <p>Welcome to your homepage.</p>
+<div id = "welcomeDiv"> 
+    <!-- <p>Welcome to your homepage.</p> -->
+    </div>
     <div id="newBoardForm">
         <p> this is the board (event) creation form. enter data here to add a new board to your account.</p>
         <form action="/submitBoard" method="post">
@@ -63,6 +65,11 @@ $(function() {
         		// newBoard.appendChild(a);
 
         		$("#listOfBoards").append(newBoard);
+                
+                if (i === boards.length-1) {
+                    $("#welcomeDiv").append("Welcome to your homepage, " + board.owner+".");
+                }
+            
         	}
 
             
@@ -71,6 +78,8 @@ $(function() {
         }
     });
 });
+
+//a function to display the user's email
 </script>
 
 </html>

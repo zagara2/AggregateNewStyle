@@ -263,10 +263,39 @@ var Link = require("./models/linkModel.js");
 app.get("/eventPage/:id", function(req, res) {
 
     sess = req.session;
+    // console.log(req.params.id);
 
     if (sess.email) {
 
+
         res.sendFile(__dirname + "/html/eventPage.html");
+
+
+    } else {
+        res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+    }
+});
+
+
+app.get("/eventPage/api/:id", function(req, res) {
+
+    sess = req.session;
+    console.log(req.params.id);
+
+    if (sess.email) {
+
+    	Board.find({_id:req.params.id})
+            .exec(function(err, doc) {
+
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.send(doc);
+                }
+            });
+
+        
 
 
     } else {
