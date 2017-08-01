@@ -56,7 +56,7 @@ $(document).ready(function() {
 
             if (data === 'done') {
                 window.location.href = "/admin";
-                
+
             } else if (data.level === "warning") {
                 
                 alert(data.msg);
@@ -100,6 +100,8 @@ $(function() {
         		newBoard.append(textnode);
         		newBoard.append(textnode3);
         		newBoard.append(textnode2);
+                newButton = $("<input type='button' value='Delete' id='delete'> <br> <br>");
+                newBoard.append(newButton);
 
 
         		

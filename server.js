@@ -280,6 +280,48 @@ app.get("/myBoards", function(req, res) {
 });
 
 
+//delete a board
+
+
+app.delete("/eventPage/:id/", function(req, res) {
+
+	sess = req.session;
+
+  // first remove all links from the board
+
+  if (sess.email) {   
+
+  Link.find({$and: [{ addedBy: sess.email }, {boardID: req.params.id}]}).remove().exec(function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      console.log("links deleted");
+    }
+  });
+
+//now delete the empty board
+
+Board.find({$and: [{ addedBy: sess.email }, {boardID: req.params.id}]}).remove().exec(function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.redirect("/admin");
+    }
+  });
+
+
+}
+
+else {
+	res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+
+}
+});
+
+
 
 
 //end of routes for board creation
@@ -430,6 +472,35 @@ app.get("/eventPage/:id/myLinks", function(req, res) {
         res.write('<h1>Please login first.</h1>');
         res.end('<a href="/">Login</a>');
     }
+});
+
+//delete a link
+
+
+app.delete("/eventPage/:id/:linkID", function(req, res) {
+
+	sess = req.session;
+
+  // var id = req.params(id);
+
+  if (sess.email) {   
+
+  Link.find({$and: [{ addedBy: sess.email }, { _id: req.params.linkID }, {boardID: req.params.id}]}).remove().exec(function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.redirect("/eventPage/:id");
+    }
+  });
+
+}
+
+else {
+	res.write('<h1>Please login first.</h1>');
+        res.end('<a href="/">Login</a>');
+
+}
 });
 
 
