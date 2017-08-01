@@ -91,65 +91,7 @@ var boardID = overallurlArray[overallurlArray.length - 1];
 
 $(function() {
     // var url = document.getUrl.split("/")[-1];
-    $.get("/eventPage/" + boardID + "/myLinks", function(links) {
-        // or is it like: $.get("/eventPage/:id/myLinks", function(links) {
-
-        if (links !== 'undefined') {
-            // var boardDiv = document.getElementById("listOfBoards");
-            for (var i = 0, len = links.length; i < len; i++) {
-                var linkObject = links[i];
-                console.log(linkObject);
-                // var newBoard = document.createElement("div");
-                var newLink = $("<div>");
-                var rating = linkObject.rating.toString();
-                // var a = document.createElement("a");
-                myUrl = linkObject.url;
-
-                if (!linkObject.url.startsWith("http")) {
-
-                    myUrl = "https://" + linkObject.url;
-
-                }
-
-
-                var textnode = "<a href ='" + myUrl + "' target='_blank'>" + linkObject.title + "</a> <br>";
-                var textnode2 = "Rating: " + rating + "<br>";
-
-                // var textnode3 =  + "<br>";
-
-
-                newLink.append(textnode);
-                // newBoard.append(textnode3);
-                newLink.append(textnode2);
-                newButton = $("<input type='button' value='Delete' id='delete'> <br> <br>");
-                newLink.append(newButton);
-
-
-
-                //newBoard.textContent = "jfksdlfja";
-                // newBoard.appendChild(a);
-
-                // if (linkObject.linkType === "twitter" || linkObject.linkType === "Twitter") {
-                if (myUrl.includes("twitter.com")) {
-
-                    $("#twitterDiv").append(newLink);
-
-                } else if (myUrl.includes("soundcloud.com")) {
-                    $("#soundcloudDiv").append(newLink);
-                } else if (myUrl.includes("youtube.com")) {
-                    $("#youtubeDiv").append(newLink);
-                } else {
-                    $("#articleDiv").append(newLink);
-                }
-
-
-            }
-
-
-        } else {
-            alert("No links to display.");
-        }
-    });
+    
 });
 
 //third function: make a title for the page with the appropriate board name
@@ -182,6 +124,121 @@ $(function() {
             $('#titleDiv').append('<h1>Untitled Board</h1>');
         }
     });
+});
+
+
+//fourth function: onclick event for delete buttons
+$(document).ready(function() {
+
+
+	$.get("/eventPage/" + boardID + "/myLinks", function(links) {
+        // or is it like: $.get("/eventPage/:id/myLinks", function(links) {
+
+        if (links !== 'undefined') {
+            // var boardDiv = document.getElementById("listOfBoards");
+            for (var i = 0, len = links.length; i < len; i++) {
+                var linkObject = links[i];
+                console.log(linkObject);
+                // var newBoard = document.createElement("div");
+                var newLink = $("<div>");
+                var rating = linkObject.rating.toString();
+                // var a = document.createElement("a");
+                myUrl = linkObject.url;
+
+                if (!linkObject.url.startsWith("http")) {
+
+                    myUrl = "https://" + linkObject.url;
+
+                }
+
+
+                var textnode = "<a href ='" + myUrl + "' target='_blank'>" + linkObject.title + "</a> <br>";
+                var textnode2 = "Rating: " + rating + "<br>";
+
+                // var textnode3 =  + "<br>";
+
+
+                newLink.append(textnode);
+                // newBoard.append(textnode3);
+                newLink.append(textnode2);
+                newButton = $("<input type='button' value='Delete' class='delete'> <br> <br>");
+                newButton.attr("linkid", linkObject._id);
+                newLink.append(newButton);
+
+
+
+                //newBoard.textContent = "jfksdlfja";
+                // newBoard.appendChild(a);
+
+
+          //       example of adding data attr to button:
+          //       var a = $("<button>");
+          // // Adding a class
+          // a.addClass("movie");
+          // // Adding a data-attribute with a value of the movie at index i
+          // a.attr("data-name", movies[i]);
+          // // Providing the button's text with a value of the movie at index i
+          // a.text(movies[i]);
+          // // Adding the button to the HTML
+          // $("#movies-view").append(a);
+
+                // if (linkObject.linkType === "twitter" || linkObject.linkType === "Twitter") {
+                if (myUrl.includes("twitter.com")) {
+
+                    $("#twitterDiv").append(newLink);
+
+                } else if (myUrl.includes("soundcloud.com")) {
+                    $("#soundcloudDiv").append(newLink);
+                } else if (myUrl.includes("youtube.com")) {
+                    $("#youtubeDiv").append(newLink);
+                } else {
+                    $("#articleDiv").append(newLink);
+                }
+
+
+            }
+
+            $(".delete").click(function(ev) {
+				//get the attr out of the button to get the link id
+				//the button takes you to "/eventPage/:id/:linkID"
+				console.log("button clicked");
+				console.log(ev.target.getAttribute("linkid"));
+				var linkID = ev.target.getAttribute("linkid");
+				//var linkID = ev.target.linkID;
+				console.log("link id: " + linkID);
+
+
+				// $.delete("/link/" + linkID, { }, function(data) {
+
+		            // if (data === 'done') {
+		            //     window.location.href = "/eventPage/" + boardID;
+		            // } else if (data.level === "warning") {
+		            //     // alert(JSON.stringify(data));
+		            //     alert(data.msg);
+		            // }\
+		        $.ajax({
+		         	url: "/link/" + linkID,
+		         	type: "DELETE",
+		         	success: function(data) {
+			            if (data === 'done') {
+			                window.location.href = "/eventPage/" + boardID;
+			           	}
+			        }
+			    });
+		    })
+
+        } else {
+            alert("No links to display.");
+        }
+    });
+
+
+
+	
+
+	// });
+
+
 });
 
 </script>

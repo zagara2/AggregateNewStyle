@@ -210,41 +210,39 @@ app.post("/submitBoard", function(req, res) {
                     res.send(JSON.stringify(flash));
 
 
-                }
+                } else {
+                    console.log("enough boards");
 
-                else {
-                	console.log("enough boards");
-
-                	// Save the new board we made to mongoDB with mongoose's save function
-        Board.create(newBoard, function(err, doc) {
-            // Log any errors
-            if (err) {
-                console.log(err);
-            }
-            // Or just log the doc we saved
-            else {
-                // console.log(doc);
-                // res.send(doc); 
-                //uncomment above line just to see api stuff for the given board, otherwise the below line just sends you back to 
-                //an updated version of your landing page
-                //should it send you right to the page for that event?
-                console.log("board created");
-                // res.redirect("/admin");
-                res.end('done');
-                // Place the log back in this callback function
-                // so it can be used with other functions asynchronously
-                // cb(doc);
-            }
-        });
+                    // Save the new board we made to mongoDB with mongoose's save function
+                    Board.create(newBoard, function(err, doc) {
+                        // Log any errors
+                        if (err) {
+                            console.log(err);
+                        }
+                        // Or just log the doc we saved
+                        else {
+                            // console.log(doc);
+                            // res.send(doc); 
+                            //uncomment above line just to see api stuff for the given board, otherwise the below line just sends you back to 
+                            //an updated version of your landing page
+                            //should it send you right to the page for that event?
+                            console.log("board created");
+                            // res.redirect("/admin");
+                            res.end('done');
+                            // Place the log back in this callback function
+                            // so it can be used with other functions asynchronously
+                            // cb(doc);
+                        }
+                    });
 
 
 
                 }
             });
 
-       
 
-        
+
+
 
     } else {
         res.write('<h1>Please login first.</h1>');
@@ -283,42 +281,43 @@ app.get("/myBoards", function(req, res) {
 //delete a board
 
 
-app.delete("/eventPage/:id/", function(req, res) {
+app.delete("/eventPage/:id", function(req, res) {
 
-	sess = req.session;
+    sess = req.session;
 
-  // first remove all links from the board
+    // first remove all links from the board
 
-  if (sess.email) {   
+    if (sess.email) {
 
-  Link.find({$and: [{ addedBy: sess.email }, {boardID: req.params.id}]}).remove().exec(function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      console.log("links deleted");
-    }
-  });
+        Link.find({ $and: [{ addedBy: sess.email }, { boardID: req.params.id }] }).remove().exec(function(err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("links deleted");
+            }
+        });
 
-//now delete the empty board
+        //now delete the empty board
 
-Board.find({$and: [{ addedBy: sess.email }, {boardID: req.params.id}]}).remove().exec(function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.redirect("/admin");
-    }
-  });
+        var boardID = req.params.id;
+        console.log("board id: " + boardID);
+
+        Board.find({ $and: [{ owner: sess.email }, { _id: boardID }] }).remove().exec(function(err) {
+            if (err) {
+                console.log(err);
+            } else {
+            	console.log("board deleted");
+                // res.redirect("/admin");
+                res.end('done');
+            }
+        });
 
 
-}
-
-else {
-	res.write('<h1>Please login first.</h1>');
+    } else {
+        res.write('<h1>Please login first.</h1>');
         res.end('<a href="/">Login</a>');
 
-}
+    }
 });
 
 
@@ -475,32 +474,29 @@ app.get("/eventPage/:id/myLinks", function(req, res) {
 });
 
 //delete a link
+app.delete("/link/:linkID", function(req, res) { //pass the linkID as a data attribute to the delete button
 
+    sess = req.session;
 
-app.delete("/eventPage/:id/:linkID", function(req, res) {
+    // var id = req.params(id);
 
-	sess = req.session;
+    if (sess.email) {
 
-  // var id = req.params(id);
+        Link.find({ $and: [{ addedBy: sess.email }, { _id: req.params.linkID }] }).remove().exec(function(err) { //find the link added by current user on current board with given id
+            if (err) {
+                console.log(err);
+            } else {
+                // res.redirect("/eventPage/:id");
+                console.log("deleted");
+                res.end('done');
+            }
+        });
 
-  if (sess.email) {   
-
-  Link.find({$and: [{ addedBy: sess.email }, { _id: req.params.linkID }, {boardID: req.params.id}]}).remove().exec(function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.redirect("/eventPage/:id");
-    }
-  });
-
-}
-
-else {
-	res.write('<h1>Please login first.</h1>');
+    } else {
+        res.write('<h1>Please login first.</h1>');
         res.end('<a href="/">Login</a>');
 
-}
+    }
 });
 
 

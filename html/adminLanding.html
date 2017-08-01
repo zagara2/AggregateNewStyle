@@ -100,7 +100,8 @@ $(function() {
         		newBoard.append(textnode);
         		newBoard.append(textnode3);
         		newBoard.append(textnode2);
-                newButton = $("<input type='button' value='Delete' id='delete'> <br> <br>");
+                newButton = $("<input type='button' value='Delete' class='delete'> <br> <br>");
+                newButton.attr("boardid", board._id);
                 newBoard.append(newButton);
 
 
@@ -110,11 +111,40 @@ $(function() {
 
         		$("#listOfBoards").append(newBoard);
                 
-                if (i === boards.length-1) {
+                if (i === 0) {
                     $("#welcomeDiv").append("Welcome to your homepage, " + board.owner+".");
                 }
             
         	}
+
+            $(".delete").click(function(ev) {
+                //get the attr out of the button to get the link id
+                //the button takes you to "/eventPage/:id/:linkID"
+                console.log("button clicked");
+                console.log(ev.target.getAttribute("boardid"));
+                var boardID = ev.target.getAttribute("boardid");
+                //var linkID = ev.target.linkID;
+                console.log("board id: " + boardID);
+
+
+                // $.delete("/link/" + linkID, { }, function(data) {
+
+                    // if (data === 'done') {
+                    //     window.location.href = "/eventPage/" + boardID;
+                    // } else if (data.level === "warning") {
+                    //     // alert(JSON.stringify(data));
+                    //     alert(data.msg);
+                    // }\
+                $.ajax({
+                    url: "/eventPage/" + boardID,
+                    type: "DELETE",
+                    success: function(data) {
+                        if (data === 'done') {
+                            window.location.href = "/admin";
+                        }
+                    }
+                });
+            });
 
             
         } else {
